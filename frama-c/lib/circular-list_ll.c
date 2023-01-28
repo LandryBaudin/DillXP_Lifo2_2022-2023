@@ -14,36 +14,34 @@ struct cl {
   struct cl *next;
 };
 
-// We exclude the last element which represents the end of a cycle
 /*@
-predicate separated_from_clist{L} (struct cl* element, \list<struct cl*> l) =
-	\forall integer n; 0 <= n < \length(l) - 1 ==> 
+predicate separated_from_list{L} (struct cl* element, \list<struct cl*> l) =
+	\forall integer n; 0 <= n < \length(l) ==> 
 	\separated(\nth(l,n), element);
 
-predicate in_clist{L} (struct cl* element, \list<struct cl*> l) =
+predicate in_list{L} (struct cl* element, \list<struct cl*> l) =
 	\exists integer n; 
-	0 <= n < \length(l) - 1 && \nth(l,n) == element;
+	0 <= n < \length(l) && \nth(l,n) == element;
 	
 	
 predicate unchanged{L1,L2}(\list<struct cl*> l) =
 	\forall integer n; 0 <= n < \length(l) ==>
 		(\valid{L1}(\nth(l,n)) && \valid{L2}(\nth(l,n)) &&
-		\at(\nth(l,n),L1) == \at(\nth(l,n),L2));
+		\at(\nth(l,n)->next,L1) == \at(\nth(l,n)->next,L2));
 
 */
 
-// root = current element, bound = first and last element of the original liste
 /*@
 inductive linked_ll{L}(struct cl *root, struct cl *bound, \list<struct cl*> l) {
 	
 	case linked_ll_bound{L}:
-		\forall struct cl *root; linked_ll{L}(root,root,\Nil);
+		\forall struct cl *bound; linked_ll{L}(bound,bound,\Nil);
 	
 	case linked_ll_cons{L}:
 		\forall struct cl *root, *bound, \list<struct cl*> tail;
 			\separated(root,bound) ==> \valid(root) ==>
 			linked_ll{L}(root->next, bound, tail) ==>
-			separated_from_clist(root,tail) ==>
+			separated_from_list(root,tail) ==>
 			linked_ll{L}(root,bound, \Cons(root, tail));
 }
 
@@ -53,32 +51,41 @@ axiomatic to_logic_list {
 	logic \list<struct cl*>
 	to_ll{L}(struct cl *root, struct cl *bound)
 		reads { e->next | struct cl *e; 
-			\valid(e) && in_clist(e, to_ll(root,bound)) };
+			\valid(e) && in_list(e, to_ll(root,bound)) };
 			
+	axiom to_ll_cons{L}:
+		\forall struct cl *root, *bound;
+		\let tail = to_ll{L}(root->next,bound);
+		\separated(root,bound) ==> \valid(root) ==>
+		separated_from_list(root,tail) ==>
+		to_ll{L}(root,bound) == (\Cons(root,tail));
+		
+	axiom to_ll_not_empty{L}:
+		\forall struct cl *root;
+		root != NULL ==> \length(to_ll{L}(root,root)) >= 1;
 }
 */
-
 
 /*@
 requires \valid(cList) && \valid(element);
 requires \valid_read(&(*cList)->next);
 requires linked_ll(*cList, *cList, to_ll(*cList, *cList));
-requires in_clist(element, to_ll(*cList, *cList)) ||
-	separated_from_clist(element, to_ll(*cList,*cList));
+requires in_list(element, to_ll(*cList, *cList)) ||
+	separated_from_list(element, to_ll(*cList,*cList));
 
 assigns *cList,
 	{ cl->next | struct cl *cl; \at(cl->next, Pre) == element &&
-		in_clist(cl, to_ll{Pre}(\at(*cList, Pre), *cList)) };
+		in_list(cl, to_ll{Pre}(\at(*cList, Pre), *cList)) };
 
 ensures linked_ll(*cList, *cList, to_ll(*cList,*cList));
-ensures separated_from_clist(element, to_ll(*cList, *cList));
+ensures separated_from_list(element, to_ll(*cList, *cList));
 
 behavior not_in_clist:
-	assumes ! in_clist(element, to_ll(*cList,*cList));
+	assumes ! in_list(element, to_ll(*cList,*cList));
 	ensures to_ll(*cList,*cList) == to_ll{Pre}(\old(*cList),*cList);
 
 behavior in_clist:
-	assumes in_clist(element, to_ll(*cList,*cList));
+	assumes in_list(element, to_ll(*cList,*cList));
 	ensures to_ll (*cList , *cList ) ==
 		(to_ll{Pre}(\old(*cList), element) ^ to_ll{Pre}(element->next, *cList));
 
@@ -103,12 +110,10 @@ circular_list_remove(circular_list_t cList, struct cl *element)
   previous = *cList;
   this = previous->next;
   //@ ghost int i = 1;
-  
-  
-/*@ loop invariant this == \nth(to_ll(*cList,*cList),i);
-	loop invariant 1 <= i <= \length(to_ll(*cList,*cList));
-	loop invariant this == previous->next;
+    
+/*@ loop invariant this == \nth(to_ll(*cList,*cList),i%\length(to_ll(*cList,*cList)));
 	loop assigns i, this, previous;
+	loop variant \length(to_ll(*cList,*cList)) - i;
 */
   do {
     if(this == element) {
