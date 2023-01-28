@@ -23,6 +23,13 @@ predicate separated_from_clist{L} (struct cl* element, \list<struct cl*> l) =
 predicate in_clist{L} (struct cl* element, \list<struct cl*> l) =
 	\exists integer n; 
 	0 <= n < \length(l) - 1 && \nth(l,n) == element;
+	
+	
+predicate unchanged{L1,L2}(\list<struct cl*> l) =
+	\forall integer n; 0 <= n < \length(l) ==>
+		(\valid{L1}(\nth(l,n)) && \valid{L2}(\nth(l,n)) &&
+		\at(\nth(l,n),L1) == \at(\nth(l,n),L2));
+
 */
 
 // root = current element, bound = first and last element of the original liste
@@ -54,6 +61,7 @@ axiomatic to_logic_list {
 
 /*@
 requires \valid(cList) && \valid(element);
+requires \valid_read(&(*cList)->next);
 requires linked_ll(*cList, *cList, to_ll(*cList, *cList));
 requires in_clist(element, to_ll(*cList, *cList)) ||
 	separated_from_clist(element, to_ll(*cList,*cList));
@@ -94,8 +102,14 @@ circular_list_remove(circular_list_t cList, struct cl *element)
    */
   previous = *cList;
   this = previous->next;
+  //@ ghost int i = 1;
   
   
+/*@ loop invariant this == \nth(to_ll(*cList,*cList),i);
+	loop invariant 1 <= i <= \length(to_ll(*cList,*cList));
+	loop invariant this == previous->next;
+	loop assigns i, this, previous;
+*/
   do {
     if(this == element) {
       previous->next = this->next;
@@ -105,6 +119,6 @@ circular_list_remove(circular_list_t cList, struct cl *element)
     
     previous = this;
     this = this->next;
-    
-  } while(this != ((struct cl *)*cList)->next);
+    //@ ghost i++;
+  } while(this != (*cList)->next);
 }
