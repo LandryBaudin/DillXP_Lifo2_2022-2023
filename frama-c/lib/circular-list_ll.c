@@ -59,16 +59,22 @@ axiomatic to_logic_list {
 		\separated(root,bound) ==> \valid(root) ==>
 		separated_from_list(root,tail) ==>
 		to_ll{L}(root,bound) == (\Cons(root,tail));
-		
+
 	axiom to_ll_not_empty{L}:
 		\forall struct cl *root;
-		root != NULL ==> \length(to_ll{L}(root,root)) >= 1;
+        \valid(root) && \valid(root->next) ==> 
+        	\length(to_ll{L}(root,root)) > 0;
 }
+*/
+
+/*@ lemma valid_eq{L}:
+		\forall struct cl *cur, *next;
+		\valid(&(cur->next)) && next == cur->next ==> \valid(next);
 */
 
 /*@
 requires \valid(cList) && \valid(element);
-requires \valid_read(&(*cList)->next);
+requires \valid(&(*cList)->next);
 requires linked_ll(*cList, *cList, to_ll(*cList, *cList));
 requires in_list(element, to_ll(*cList, *cList)) ||
 	separated_from_list(element, to_ll(*cList,*cList));
@@ -102,6 +108,8 @@ circular_list_remove(circular_list_t cList, struct cl *element)
     return;
   }
   
+  //@ assert \length(to_ll(*cList,*cList)) > 0;
+  
    /*
    * We start traversing from the second element.
    * The head will be visited last. We always update the list's head after
@@ -110,7 +118,7 @@ circular_list_remove(circular_list_t cList, struct cl *element)
   previous = *cList;
   this = previous->next;
   //@ ghost int i = 1;
-    
+  
 /*@ loop invariant this == \nth(to_ll(*cList,*cList),i%\length(to_ll(*cList,*cList)));
 	loop assigns i, this, previous;
 	loop variant \length(to_ll(*cList,*cList)) - i;
