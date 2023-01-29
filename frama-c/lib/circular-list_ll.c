@@ -60,12 +60,10 @@ axiomatic to_logic_list {
 		separated_from_list(root,tail) ==>
 		to_ll{L}(root,bound) == (\Cons(root,tail));
 
-	axiom to_ll_not_empty{L}:
-		\forall struct cl *root;
-        \valid_read(root) && \valid_read(root->next) ==> 
-        	\length(to_ll{L}(root,root)) > 0;
+
 }
 */
+
 
 /*@ lemma valid_eq{L}:
 		\forall struct cl *cur, *next;
@@ -169,9 +167,17 @@ bool circular_list_is_empty(const circular_list_t cl /*@ wp__nullable */){
 	assigns \nothing;
 	
 	ensures \result >= 0;
-	ensures cl == NULL ==> \result == 0;
-	ensures cl != NULL ==> \result == \length(to_ll(*cl, *cl));
-
+	
+	behavior empty:
+		assumes cl == NULL;
+		ensures \result == 0;
+		
+	behavior not_empty:
+		assumes cl != NULL;
+		ensures \result == \length(to_ll(*cl, *cl));
+	
+  disjoint behaviors;
+  complete behaviors;
 */
 unsigned long
 circular_list_length(const circular_list_t cl)
@@ -183,7 +189,7 @@ circular_list_length(const circular_list_t cl)
   	//@ assert \length(to_ll(*cl,*cl)) == 0;
     return 0;
   }
-  
+//@ assert \length(to_ll(*cl,*cl)) > 0;
 /*@ loop invariant this == \nth(to_ll(*cl,*cl),(len-1)%\length(to_ll(*cl,*cl)));
 	loop assigns len, this;
 	loop variant \length(to_ll(*cl,*cl)) - (len-1);
@@ -194,8 +200,6 @@ circular_list_length(const circular_list_t cl)
 
   return len;
 }
-
-
 
 
 
