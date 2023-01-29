@@ -62,7 +62,7 @@ axiomatic to_logic_list {
 
 	axiom to_ll_not_empty{L}:
 		\forall struct cl *root;
-        \valid(root) && \valid(root->next) ==> 
+        \valid_read(root) && \valid_read(root->next) ==> 
         	\length(to_ll{L}(root,root)) > 0;
 }
 */
@@ -70,6 +70,10 @@ axiomatic to_logic_list {
 /*@ lemma valid_eq{L}:
 		\forall struct cl *cur, *next;
 		\valid(&(cur->next)) && next == cur->next ==> \valid(next);
+		
+	lemma valid_read_eq{L}:
+		\forall struct cl *cur, *next;
+		\valid_read(&(cur->next)) && next == cur->next ==> \valid_read(next);
 */
 
 /*@
@@ -135,3 +139,63 @@ circular_list_remove(circular_list_t cList, struct cl *element)
     //@ ghost i++;
   } while(this != (*cList)->next);
 }
+
+
+/*@
+requires \valid_read(cl);
+assigns \nothing;
+
+ensures \result == true || \result == false;
+
+behavior is_cl_null:
+  assumes *cl == NULL;
+  ensures \result == true;
+
+  behavior not_cl_null:
+    assumes *cl != NULL;
+    ensures \result == false;
+
+  disjoint behaviors;
+  complete behaviors;
+*/
+bool circular_list_is_empty(const circular_list_t cl /*@ wp__nullable */){
+  return *cl == NULL ? true : false;
+}
+
+
+/*@ requires \valid_read(cl) && \valid_read(&(*cl)->next);
+	requires linked_ll(*cl, *cl, to_ll(*cl, *cl));
+		
+	assigns \nothing;
+	
+	ensures \result >= 0;
+	ensures cl == NULL ==> \result == 0;
+	ensures cl != NULL ==> \result == \length(to_ll(*cl, *cl));
+
+*/
+unsigned long
+circular_list_length(const circular_list_t cl)
+{
+  unsigned long len = 1;
+  struct cl *this;
+
+  if(circular_list_is_empty(cl)) {
+  	//@ assert \length(to_ll(*cl,*cl)) == 0;
+    return 0;
+  }
+  
+/*@ loop invariant this == \nth(to_ll(*cl,*cl),(len-1)%\length(to_ll(*cl,*cl)));
+	loop assigns len, this;
+	loop variant \length(to_ll(*cl,*cl)) - (len-1);
+*/
+  for(this = *cl; this->next != *cl; this = this->next) {
+    len++;
+  }
+
+  return len;
+}
+
+
+
+
+
