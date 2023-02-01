@@ -36,15 +36,22 @@ inductive linked_ll{L}(struct cl *root, struct cl *bound, \list<struct cl*> l) {
 	
 	case linked_ll_bound{L}:
 		\forall struct cl *bound; linked_ll{L}(bound,bound,\Nil);
-	
+				
+	case linked_ll_first{L}:
+		\forall struct cl *root, \list<struct cl*> tail;
+			\valid(root) ==>
+			linked_ll{L}(root->next, root, tail) ==>
+			separated_from_list(root,tail) ==>
+			linked_ll{L}(root, root, \Cons(root, tail));
+			
 	case linked_ll_cons{L}:
 		\forall struct cl *root, *bound, \list<struct cl*> tail;
-			\separated(root,bound) ==> \valid(root) ==>
+			\separated(root,bound) ==> \valid(root) ==> \valid(bound) ==>
 			linked_ll{L}(root->next, bound, tail) ==>
 			separated_from_list(root,tail) ==>
-			linked_ll{L}(root,bound, \Cons(root, tail));
-}
+			linked_ll{L}(root, bound, \Cons(root, tail));
 
+}
 
 axiomatic to_logic_list {
 
@@ -53,28 +60,45 @@ axiomatic to_logic_list {
 		reads { e->next | struct cl *e; 
 			\valid(e) && in_list(e, to_ll(root,bound)) };
 			
+	logic \list<struct cl*>
+	to_ll_aux{L}(struct cl *root, struct cl *bound)
+		reads { e->next | struct cl *e; \valid(e) && in_list(e, to_ll_aux(root,bound)) };
+
+		
+	axiom to_ll_nil{L}:
+		\forall struct cl *bound;
+			to_ll(NULL,bound) == \Nil;
+
 	axiom to_ll_cons{L}:
 		\forall struct cl *root, *bound;
-		\let tail = to_ll{L}(root->next,bound);
-		\separated(root,bound) ==> \valid(root) ==>
+		\let tail = to_ll_aux{L}(root->next,bound);
+		\valid(root) ==> \valid(bound) ==>
 		separated_from_list(root,tail) ==>
-		to_ll{L}(root,bound) == (\Cons(root,tail));
+			to_ll{L}(root, bound) == \Cons(root,tail);
 
 
+	axiom to_ll_aux_nil{L}:
+		\forall struct cl *bound;
+			to_ll_aux(bound,bound) == \Nil;
+			
+	axiom to_ll_aux_cons{L}:
+		\forall struct cl *root, *bound;
+		\let tail = to_ll_aux{L}(root->next,bound);
+		\separated(root,bound) ==> \valid(root) ==> \valid(bound) ==>
+		separated_from_list(root,tail) ==>
+			to_ll_aux{L}(root,bound) == \Cons(root,tail);
 }
 */
 
 
-/*@ lemma valid_eq{L}:
-		\forall struct cl *cur, *next;
-		\valid(&(cur->next)) && next == cur->next ==> \valid(next);
-		
-	lemma valid_read_eq{L}:
-		\forall struct cl *cur, *next;
-		\valid_read(&(cur->next)) && next == cur->next ==> \valid_read(next);
+/*@ lemma linked_ll_unchanged {L1,L2}:
+	\forall struct cl *root, *bound , \list< struct cl*> l ;
+	linked_ll{L1}(root,bound,l) ==>
+	unchanged{L1,L2}(l) ==>
+	linked_ll{L2}(root,bound,l);
 */
 
-/*@
+/* @
 requires \valid(cList) && \valid(element);
 requires \valid(&(*cList)->next);
 requires linked_ll(*cList, *cList, to_ll(*cList, *cList));
@@ -121,7 +145,7 @@ circular_list_remove(circular_list_t cList, struct cl *element)
   this = previous->next;
   //@ ghost int i = 1;
   
-/*@ loop invariant this == \nth(to_ll(*cList,*cList),i%\length(to_ll(*cList,*cList)));
+/* @ loop invariant this == \nth(to_ll(*cList,*cList),i%\length(to_ll(*cList,*cList)));
 	loop assigns i, this, previous;
 	loop variant \length(to_ll(*cList,*cList)) - i;
 */
@@ -161,7 +185,7 @@ bool circular_list_is_empty(const circular_list_t cl /*@ wp__nullable */){
 }
 
 
-/*@ requires \valid_read(cl) && \valid_read(&(*cl)->next);
+/*@ requires \valid_read(cl);
 	requires linked_ll(*cl, *cl, to_ll(*cl, *cl));
 		
 	assigns \nothing;
@@ -169,11 +193,11 @@ bool circular_list_is_empty(const circular_list_t cl /*@ wp__nullable */){
 	ensures \result >= 0;
 	
 	behavior empty:
-		assumes cl == NULL;
+		assumes \length(to_ll(*cl,*cl)) == 0;
 		ensures \result == 0;
 		
 	behavior not_empty:
-		assumes cl != NULL;
+		assumes \length(to_ll(*cl,*cl)) > 0;
 		ensures \result == \length(to_ll(*cl, *cl));
 	
   disjoint behaviors;
@@ -190,11 +214,12 @@ circular_list_length(const circular_list_t cl)
     return 0;
   }
 //@ assert \length(to_ll(*cl,*cl)) > 0;
-/*@ loop invariant this == \nth(to_ll(*cl,*cl),(len-1)%\length(to_ll(*cl,*cl)));
+/*@ loop invariant this == \nth(to_ll(*cl,*cl), len-1);
+	loop invariant 1 <= len <= \length(to_ll(*cl,*cl));
 	loop assigns len, this;
-	loop variant \length(to_ll(*cl,*cl)) - (len-1);
 */
   for(this = *cl; this->next != *cl; this = this->next) {
+  	//@ assert linked_ll(this, *cl, to_ll(this,*cl));
     len++;
   }
 
