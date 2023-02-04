@@ -273,18 +273,5 @@ circular_list_length(const circular_list_t cl)
 
   return len;
 }
-/*
-void main() {
-	struct cl* a = (struct cl*) malloc(sizeof(struct cl));
-	struct cl* b = (struct cl*) malloc(sizeof(struct cl));
-
-		a->next = b;
-		b->next = a;
-		
-		circular_list_t cl = &a;
-		
-		circular_list_length(cl);
-}
-*/
 
 
