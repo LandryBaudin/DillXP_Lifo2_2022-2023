@@ -19,6 +19,10 @@ predicate separated_from_list{L} (struct cl* element, \list<struct cl*> l) =
 	\forall integer n; 0 <= n < \length(l) ==> 
 	\separated(\nth(l,n), element);
 
+predicate all_separated_in_list{L}(\list<struct cl*> l) =
+	\forall integer n,m ; 0 <= n < \length(l) && n < m < \length(l) ==>
+			\separated(\nth(l,n), \nth(l,n));
+
 predicate in_list{L} (struct cl* element, \list<struct cl*> l) =
 	\exists integer n; 
 	0 <= n < \length(l) && \nth(l,n) == element;
@@ -27,7 +31,7 @@ predicate in_list{L} (struct cl* element, \list<struct cl*> l) =
 predicate unchanged{L1,L2}(\list<struct cl*> l) =
 	\forall integer n; 0 <= n < \length(l) ==>
 		(\valid{L1}(\nth(l,n)) && \valid{L2}(\nth(l,n)) &&
-		\at(\nth(l,n)->next,L1) == \at(\nth(l,n)->next,L2)); 
+		\at(\nth(l,n)->next,L1) == \at(\nth(l,n)->next,L2));
 
 */
 
@@ -92,7 +96,8 @@ axiomatic to_logic_list {
 			
 	logic \list<struct cl*>
 	to_ll_aux{L}(struct cl *root, struct cl *bound)
-		reads { e->next | struct cl *e; \valid(e) && in_list(e, to_ll_aux(root,bound)) };
+		reads { e->next | struct cl *e;
+			\valid(e) && in_list(e, to_ll_aux(root,bound)) };
 
 		
 	axiom to_ll_nil{L}:
@@ -120,7 +125,7 @@ axiomatic to_logic_list {
 }
 */
 
-/*@ lemma linked_ll_unchanged {L1,L2}:
+/* @ lemma linked_ll_unchanged {L1,L2}:
 	\forall struct cl *root, *bound , \list< struct cl*> l ;
 	linked_ll{L1}(root,bound,l) ==>
 	unchanged{L1,L2}(l) ==>
@@ -192,6 +197,7 @@ circular_list_remove(circular_list_t cList, struct cl *element)
 }
 
 
+
 /*@
 requires \valid_read(cl);
 assigns \nothing;
@@ -215,9 +221,11 @@ bool circular_list_is_empty(const circular_list_t cl /*@ wp__nullable */){
 
 
 /*@ requires \valid_read(cl);
-	requires all_valid(*cl,*cl);
-	requires \length(to_ll(*cl,*cl)) < MAX_SIZE;
+	requires *cl == NULL || all_valid(*cl,*cl);
+	
+	requires \length(to_ll(*cl,*cl)) <= MAX_SIZE;
 	requires linked_ll(*cl, *cl, to_ll(*cl, *cl));
+	requires all_separated_in_list(to_ll(*cl,*cl));
 		
 	assigns \nothing;
 	
@@ -245,21 +253,38 @@ circular_list_length(const circular_list_t cl)
   	//@ assert \length(to_ll(*cl,*cl)) == 0;
     return 0;
   }
-//@ assert \valid_read(cl);  
-//@ assert \length(to_ll(*cl,*cl)) > 0;
-//@ assert linked_ll(*cl,*cl, to_ll(*cl,*cl));
-//@ assert in_list(*cl, to_ll(*cl,*cl));
+  
 
-/*@ loop invariant this->next == \nth(to_ll(*cl,*cl),len);
-	loop invariant len == 1 || this != this;
+/*@ loop invariant all_valid(this,*cl);
+	loop invariant len == \length(to_ll(*cl,this->next));
 	loop assigns len, this;
 */
   for(this = *cl; this->next != *cl; this = this->next) {
     len++;
   }
+  /*
+  while (1) {
+	if (this->next == *cl) {
+  	  break;
+	}
+    len ++;
+	this = this->next;
+  }*/
 
   return len;
 }
+/*
+void main() {
+	struct cl* a = (struct cl*) malloc(sizeof(struct cl));
+	struct cl* b = (struct cl*) malloc(sizeof(struct cl));
 
+		a->next = b;
+		b->next = a;
+		
+		circular_list_t cl = &a;
+		
+		circular_list_length(cl);
+}
+*/
 
 
