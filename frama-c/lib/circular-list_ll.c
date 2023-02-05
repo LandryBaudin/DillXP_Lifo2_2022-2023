@@ -20,8 +20,9 @@ predicate separated_from_list{L} (struct cl* element, \list<struct cl*> l) =
 	\separated(\nth(l,n), element);
 
 predicate all_separated_in_list{L}(\list<struct cl*> l) =
-	\forall integer n,m ; 0 <= n < \length(l) && n < m < \length(l) ==>
-			\separated(\nth(l,n), \nth(l,n));
+	\forall integer n; 0 <= n < \length(l) ==> 
+		\forall integer m; n < m < \length(l) ==> 
+			\separated(\nth(l,n), \nth(l,m));
 
 predicate in_list{L} (struct cl* element, \list<struct cl*> l) =
 	\exists integer n; 
@@ -119,18 +120,12 @@ axiomatic to_logic_list {
 	axiom to_ll_aux_cons{L}:
 		\forall struct cl *root, *bound;
 		\let tail = to_ll_aux{L}(root->next,bound);
-		\separated(root,bound) ==> \valid(root) ==> \valid(bound) ==>
-		separated_from_list(root,tail) ==>
+		(\separated(root,bound) && \valid(root) && \valid(bound) &&
+		separated_from_list(root,tail)) ==>
 			to_ll_aux{L}(root,bound) == \Cons(root,tail);
 }
 */
 
-/* @ lemma linked_ll_unchanged {L1,L2}:
-	\forall struct cl *root, *bound , \list< struct cl*> l ;
-	linked_ll{L1}(root,bound,l) ==>
-	unchanged{L1,L2}(l) ==>
-	linked_ll{L2}(root,bound,l);
-*/
 
 /* @
 requires \valid(cList) && \valid(element);
@@ -197,7 +192,6 @@ circular_list_remove(circular_list_t cList, struct cl *element)
 }
 
 
-
 /*@
 requires \valid_read(cl);
 assigns \nothing;
@@ -222,11 +216,12 @@ bool circular_list_is_empty(const circular_list_t cl /*@ wp__nullable */){
 
 /*@ requires \valid_read(cl);
 	requires *cl == NULL || all_valid(*cl,*cl);
+	requires to_ll_aux(*cl,*cl) == \Nil ==> \length(to_ll(*cl,*cl)) <= MAX_SIZE;
+	requires to_ll_aux(*cl,*cl) == \Nil ==> all_separated_in_list(to_ll(*cl,*cl));
 	
-	requires \length(to_ll(*cl,*cl)) <= MAX_SIZE;
-	requires linked_ll(*cl, *cl, to_ll(*cl, *cl));
-	requires all_separated_in_list(to_ll(*cl,*cl));
+	requires to_ll_aux(*cl,*cl) == \Nil ==> linked_ll(*cl, *cl, to_ll(*cl, *cl));
 		
+	
 	assigns \nothing;
 	
 	ensures \result >= 0;
@@ -250,7 +245,6 @@ circular_list_length(const circular_list_t cl)
   struct cl *this;
 
   if(circular_list_is_empty(cl)) {
-  	//@ assert \length(to_ll(*cl,*cl)) == 0;
     return 0;
   }
   
@@ -262,15 +256,7 @@ circular_list_length(const circular_list_t cl)
   for(this = *cl; this->next != *cl; this = this->next) {
     len++;
   }
-  /*
-  while (1) {
-	if (this->next == *cl) {
-  	  break;
-	}
-    len ++;
-	this = this->next;
-  }*/
-
+  
   return len;
 }
 
