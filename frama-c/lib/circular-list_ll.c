@@ -16,19 +16,19 @@ struct cl {
 
 /*@
 predicate separated_from_list{L} (struct cl* element, \list<struct cl*> l) =
-	\forall integer n; 0 <= n < \length(l) ==> 
+	\forall integer n; 0 <= n < \length(l) ==>
 	\separated(\nth(l,n), element);
 
 predicate all_separated_in_list{L}(\list<struct cl*> l) =
-	\forall integer n; 0 <= n < \length(l) ==> 
-		\forall integer m; n < m < \length(l) ==> 
+	\forall integer n; 0 <= n < \length(l) ==>
+		\forall integer m; n < m < \length(l) ==>
 			\separated(\nth(l,n), \nth(l,m));
 
 predicate in_list{L} (struct cl* element, \list<struct cl*> l) =
-	\exists integer n; 
+	\exists integer n;
 	0 <= n < \length(l) && \nth(l,n) == element;
-	
-	
+
+
 predicate unchanged{L1,L2}(\list<struct cl*> l) =
 	\forall integer n; 0 <= n < \length(l) ==>
 		(\valid{L1}(\nth(l,n)) && \valid{L2}(\nth(l,n)) &&
@@ -39,11 +39,11 @@ predicate unchanged{L1,L2}(\list<struct cl*> l) =
 /*@
 
 inductive linked_ll_aux{L}(struct cl *root, struct cl *bound, \list<struct cl*> l) {
-	
+
 	case linked_ll_aux_bound{L}:
-		\forall struct cl *bound; 
+		\forall struct cl *bound;
 			linked_ll_aux{L}(bound,bound,\Nil);
-			
+
 	case linked_ll_aux_cons{L}:
 		\forall struct cl *root, *bound, \list<struct cl*> tail;
 			\separated(root,bound) ==> \valid(root) ==> \valid(bound) ==>
@@ -54,11 +54,11 @@ inductive linked_ll_aux{L}(struct cl *root, struct cl *bound, \list<struct cl*> 
 }
 
 inductive linked_ll{L}(struct cl *root, struct cl *bound, \list<struct cl*> l) {
-	
+
 	case linked_ll_empty{L}:
 		\forall struct cl *bound;
 			linked_ll{L}(NULL,bound,\Nil);
-			
+
 	case linked_ll_cons{L}:
 		\forall struct cl *root, *bound, \list<struct cl*> tail;
 			\valid(root) ==> \valid(bound) ==>
@@ -70,14 +70,14 @@ inductive linked_ll{L}(struct cl *root, struct cl *bound, \list<struct cl*> l) {
 
 /*@
 inductive all_valid_aux{L}(struct cl* cur, struct cl* bound) {
-	
+
 	case all_valid_aux_bound{L}:
 		\forall struct cl *bound;
 			\valid(&bound->next) ==> all_valid_aux{L}(bound,bound);
 
 	case all_valid_aux_rec{L}:
 		\forall struct cl *root, *bound;
-			\separated(root,bound) ==> \valid(&root->next) ==> 
+			\separated(root,bound) ==> \valid(&root->next) ==>
 				all_valid_aux{L}(root->next,bound) ==>
 				all_valid_aux{L}(root,bound);
 }
@@ -92,15 +92,15 @@ axiomatic to_logic_list {
 
 	logic \list<struct cl*>
 	to_ll{L}(struct cl *root, struct cl *bound)
-		reads { e->next | struct cl *e; 
+		reads { e->next | struct cl *e;
 			\valid(e) && in_list(e, to_ll(root,bound)) };
-			
+
 	logic \list<struct cl*>
 	to_ll_aux{L}(struct cl *root, struct cl *bound)
 		reads { e->next | struct cl *e;
 			\valid(e) && in_list(e, to_ll_aux(root,bound)) };
 
-		
+
 	axiom to_ll_nil{L}:
 		\forall struct cl *bound;
 			to_ll(NULL,bound) == \Nil;
@@ -116,7 +116,7 @@ axiomatic to_logic_list {
 	axiom to_ll_aux_nil{L}:
 		\forall struct cl *bound;
 			to_ll_aux(bound,bound) == \Nil;
-			
+
 	axiom to_ll_aux_cons{L}:
 		\forall struct cl *root, *bound;
 		\let tail = to_ll_aux{L}(root->next,bound);
@@ -132,13 +132,13 @@ axiomatic to_logic_list {
 		linked_ll{L1}(root,bound,l) ==>
 		unchanged{L1,L2}(l) ==>
 		linked_ll{L2}(root,bound,l);
-	
+
 	lemma to_ll_split {L}:
 		\forall struct cl *root , *bound , *sep , \list<struct cl*> l;
 		linked_ll(root,bound,l) ==> //implies to_ll(root,bound) == l
 		in_list (sep ,l) ==>
 		l == (to_ll (root , sep) ^ to_ll(sep,bound));
-		
+
 	lemma to_ll_merge {L}:
 		\forall struct cl *root, *sep, *bound, \list<struct cl*> l1, l2;
 		linked_ll(root,sep,l1) ==> //implies to_ll(root,sep) == l1
@@ -147,41 +147,42 @@ axiomatic to_logic_list {
 		to_ll(root,bound) == (l1 ^ l2);
 */
 
+
+/*---------------------------------------------------------------------------*/
+
 /*@
 
 	requires \valid(cl) && \valid(element);
 	requires *cl == NULL || all_valid(*cl,*cl);
 	requires to_ll_aux(*cl,*cl) == \Nil ==> \length(to_ll(*cl,*cl)) <= MAX_SIZE-2;
 	requires to_ll_aux(*cl,*cl) == \Nil ==> all_separated_in_list(to_ll(*cl,*cl));
-	
 	requires to_ll_aux(*cl,*cl) == \Nil ==> linked_ll(*cl, *cl, to_ll(*cl, *cl));
-	
 	requires to_ll_aux(*cl,*cl) == \Nil ==> (in_list(element, to_ll(*cl, *cl)) || separated_from_list(element, to_ll(*cl,*cl)));
 
-assigns *cl,
-	{ l->next | struct cl *l; \at(l->next, Pre) == element &&
-		in_list(l, to_ll{Pre}(\at(*cl, Pre), *cl)) };
+	assigns *cl,
+		{ l->next | struct cl *l; \at(l->next, Pre) == element &&
+			in_list(l, to_ll{Pre}(\at(*cl, Pre), *cl)) };
 
-ensures linked_ll(*cl, *cl, to_ll(*cl,*cl));
-ensures separated_from_list(element, to_ll(*cl, *cl));
+	ensures linked_ll(*cl, *cl, to_ll(*cl,*cl));
+	ensures separated_from_list(element, to_ll(*cl, *cl));
 
-behavior empty:
-	assumes *cl == NULL;
-	ensures unchanged{Pre,Post}(to_ll(*cl,*cl));
+	behavior empty:
+		assumes *cl == NULL;
+		ensures unchanged{Pre,Post}(to_ll(*cl,*cl));
 
-behavior not_in_cl:
-	assumes *cl != NULL && ! in_list(element, to_ll(*cl,*cl));
-	ensures unchanged{Pre,Post}(to_ll(*cl,*cl));
+	behavior not_in_cl:
+		assumes *cl != NULL && ! in_list(element, to_ll(*cl,*cl));
+		ensures unchanged{Pre,Post}(to_ll(*cl,*cl));
 
-behavior in_cl_single:
-	assumes *cl != NULL && in_list(element, to_ll(*cl,*cl)) && \length(to_ll(*cl,*cl)) == 1;
-	ensures *cl == NULL;
-	
-behavior in_cl:
-	assumes *cl != NULL && in_list(element, to_ll(*cl,*cl)) && \length(to_ll(*cl,*cl)) > 1;
-	ensures \forall integer i_element; \nth(to_ll(\old(*cl), \old(*cl)),i_element) == element ==> (
-		(*cl == element ==> to_ll(*cl,*cl) == to_ll{Pre}(\old(*cl)->next,\old(*cl)) )&&
-		(*cl != element ==> to_ll(*cl,*cl) == ( [| *cl |] ^ to_ll(element->next,*cl) ) ) );
+	behavior in_cl_single:
+		assumes *cl != NULL && in_list(element, to_ll(*cl,*cl)) && \length(to_ll(*cl,*cl)) == 1;
+		ensures *cl == NULL;
+		
+	behavior in_cl:
+		assumes *cl != NULL && in_list(element, to_ll(*cl,*cl)) && \length(to_ll(*cl,*cl)) > 1;
+		ensures \forall integer i_element; \nth(to_ll(\old(*cl), \old(*cl)),i_element) == element ==> (
+			(*cl == element ==> to_ll(*cl,*cl) == to_ll{Pre}(\old(*cl)->next,\old(*cl)) )&&
+			(*cl != element ==> to_ll(*cl,*cl) == ( [| *cl |] ^ to_ll(element->next,*cl) ) ) );
 
 complete behaviors;
 disjoint behaviors;
@@ -195,7 +196,7 @@ circular_list_remove(circular_list_t cl, struct cl *element)
   if(*cl == NULL) {
     return;
   }
-  
+
   //@ assert \length(to_ll(*cl,*cl)) > 0;
 
    /*
@@ -207,8 +208,7 @@ circular_list_remove(circular_list_t cl, struct cl *element)
   this = previous->next;
   //@ ghost int i = 0;
 
-
-/*@ 
+/*@
 	loop invariant all_valid(previous,*cl);
 	loop invariant 0 <= i <= \length(to_ll(*cl,*cl));
 	loop invariant i == \length(to_ll(*cl,*cl)) || this == \nth(to_ll(*cl,*cl),i);
@@ -231,7 +231,7 @@ circular_list_remove(circular_list_t cl, struct cl *element)
       }
       return;
     }
-    
+
     previous = this;
     this = this->next;
     //@ ghost i++;
@@ -262,26 +262,29 @@ bool circular_list_is_empty(const circular_list_t cl /*@ wp__nullable */){
 }
 
 
+/*---------------------------------------------------------------------------*/
+
+
 /*@ requires \valid_read(cl);
 	requires *cl == NULL || all_valid(*cl,*cl);
 	requires to_ll_aux(*cl,*cl) == \Nil ==> \length(to_ll(*cl,*cl)) <= MAX_SIZE;
 	requires to_ll_aux(*cl,*cl) == \Nil ==> all_separated_in_list(to_ll(*cl,*cl));
 	requires to_ll_aux(*cl,*cl) == \Nil ==> linked_ll(*cl, *cl, to_ll(*cl, *cl));
-	
-	
+
+
 	assigns \nothing;
-	
+
 	ensures \result >= 0;
-	
+
 	behavior empty:
 		assumes *cl == NULL;
 		ensures \result == 0;
-		
+
 	behavior not_empty:
 		assumes *cl != NULL;
 		ensures \result > 0;
 		ensures \result == \length(to_ll(*cl, *cl));
-	
+
   disjoint behaviors;
   complete behaviors;
 */
@@ -307,9 +310,47 @@ circular_list_length(const circular_list_t cl)
   for(this = *cl; this->next != *cl; this = this->next) {
   	len++;
   }
-  
+
 //@ assert \length(to_ll(*cl,*cl)) == len;
 //@ assert \nth(to_ll(*cl,*cl),\length(to_ll(*cl,*cl))-1) == this;
   return len;
+}
+
+/*---------------------------------------------------------------------------*/
+
+/*@
+requires \valid(cl);
+requires all_valid(*cl,*cl);
+
+behavior is_cl_null:
+  assumes *cl == NULL;
+  assigns \nothing;
+  ensures \result == NULL;
+
+  behavior not_cl_null:
+    assumes *cl != NULL;
+    ensures \result != NULL;
+    ensures \nth(to_ll(*cl,*cl), \length(to_ll(*cl, *cl)) -1);
+
+  disjoint behaviors;
+  complete behaviors;
+
+*/
+void *
+circular_list_tail(const circular_list_t cl)
+{
+  //@ requires \valid(this);
+  struct cl *this;
+
+  if(*cl == NULL) {
+    return NULL;
+  }
+
+  /*@ loop invariant all_valid(this,*cl);
+  	loop assigns this;
+  */
+  for(this = *cl; this->next != *cl; this = this->next);
+
+  return this;
 }
 
