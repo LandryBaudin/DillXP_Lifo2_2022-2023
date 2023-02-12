@@ -352,3 +352,27 @@ circular_list_tail(const circular_list_t cl)
   return this;
 }
 
+/*---------------------------------------------------------------------------*/
+
+/*@ requires \valid(cl);
+	ensures *cl == NULL;
+	assigns *cl;
+*/
+void
+circular_list_init(circular_list_t cl)
+{
+  *cl = NULL;
+}
+
+/*---------------------------------------------------------------------------*/
+
+/*@ requires \valid_read(cl);
+	ensures \result == *cl;
+	assigns \nothing;
+*/
+struct cl *
+circular_list_head(const circular_list_t cl)
+{
+  return *cl;
+}
+
