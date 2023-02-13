@@ -177,7 +177,7 @@ axiomatic to_logic_list {
 	behavior in_cl_single:
 		assumes *cl != NULL && in_list(element, to_ll(*cl,*cl)) && \length(to_ll(*cl,*cl)) == 1;
 		ensures *cl == NULL;
-		
+
 	behavior in_cl:
 		assumes *cl != NULL && in_list(element, to_ll(*cl,*cl)) && \length(to_ll(*cl,*cl)) > 1;
 		ensures \forall integer i_element; \nth(to_ll(\old(*cl), \old(*cl)),i_element) == element ==> (
@@ -328,9 +328,8 @@ behavior is_cl_null:
   ensures \result == NULL;
 
   behavior not_cl_null:
-    assumes *cl != NULL;
-    ensures \result != NULL;
-    ensures \nth(to_ll(*cl,*cl), \length(to_ll(*cl, *cl)) -1);
+    assumes *cl != NULL ;
+    ensures \result == \nth(to_ll(*cl,*cl), \length(to_ll(*cl, *cl)) -1);
 
   disjoint behaviors;
   complete behaviors;
@@ -353,4 +352,3 @@ circular_list_tail(const circular_list_t cl)
 
   return this;
 }
-
