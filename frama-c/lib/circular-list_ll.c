@@ -46,7 +46,7 @@ inductive linked_ll_aux{L}(struct cl *root, struct cl *bound, \list<struct cl*> 
 
 	case linked_ll_aux_cons{L}:
 		\forall struct cl *root, *bound, \list<struct cl*> tail;
-			\separated(root,bound) ==> \valid(root) ==> \valid(bound) ==>
+			\separated(root,bound) ==>
 			linked_ll_aux{L}(root->next, bound, tail) ==>
 			separated_from_list(root,tail) ==>
 			linked_ll_aux{L}(root, bound, \Cons(root, tail));
@@ -61,7 +61,6 @@ inductive linked_ll{L}(struct cl *root, struct cl *bound, \list<struct cl*> l) {
 
 	case linked_ll_cons{L}:
 		\forall struct cl *root, *bound, \list<struct cl*> tail;
-			\valid(root) ==> \valid(bound) ==>
 			linked_ll_aux{L}(root->next, bound, tail) ==>
 			separated_from_list(root,tail) ==>
 			linked_ll{L}(root, bound, \Cons(root, tail));
@@ -163,12 +162,12 @@ axiomatic to_logic_list {
 		{ l->next | struct cl *l; \at(l->next, Pre) == element &&
 			in_list(l, to_ll{Pre}(\at(*cl, Pre), *cl)) };
 
-	ensures linked_ll(*cl, *cl, to_ll(*cl,*cl));
+	ensures linked_ll(\at(*cl,Post), \at(*cl,Post), to_ll(\at(*cl,Post),\at(*cl,Post)));
 	ensures separated_from_list(element, to_ll(*cl, *cl));
 
 	behavior empty:
 		assumes *cl == NULL;
-		ensures unchanged{Pre,Post}(to_ll(*cl,*cl));
+		ensures *cl == NULL;
 
 	behavior not_in_cl:
 		assumes *cl != NULL && ! in_list(element, to_ll(*cl,*cl));
@@ -181,8 +180,8 @@ axiomatic to_logic_list {
 	behavior in_cl:
 		assumes *cl != NULL && in_list(element, to_ll(*cl,*cl)) && \length(to_ll(*cl,*cl)) > 1;
 		ensures \forall integer i_element; \nth(to_ll(\old(*cl), \old(*cl)),i_element) == element ==> (
-			(*cl == element ==> to_ll(*cl,*cl) == to_ll{Pre}(\old(*cl)->next,\old(*cl)) )&&
-			(*cl != element ==> to_ll(*cl,*cl) == ( [| *cl |] ^ to_ll(element->next,*cl) ) ) );
+			(*cl == element ==> to_ll(*cl,*cl) == to_ll{Pre}(\old(*cl)->next,\old(*cl)) ) &&
+			(*cl != element ==> to_ll(*cl,*cl) == ([| *cl |] ^ to_ll(element->next,*cl)) ) );
 
 complete behaviors;
 disjoint behaviors;
@@ -209,34 +208,33 @@ circular_list_remove(circular_list_t cl, struct cl *element)
   //@ ghost int i = 0;
 
 /*@
-	loop invariant all_valid(previous,*cl);
-	loop invariant 0 <= i <= \length(to_ll(*cl,*cl));
-	loop invariant i == \length(to_ll(*cl,*cl)) || this == \nth(to_ll(*cl,*cl),i);
+	loop invariant 0 <= i <= \length(to_ll{Pre}(*cl,*cl));
+	loop invariant ! in_list(element,to_ll(*cl,this));
+	loop invariant \length(to_ll(*cl,previous)) == i+1;
 	loop assigns i, this, previous, *cl,
-		{ l->next | struct cl *l; \at(l->next, Pre) == element &&
-			in_list(l, to_ll{Pre}(\at(*cl, Pre), *cl)) };
+		{ e->next | struct cl *e; \at(e->next, Pre) == element &&
+			in_list(e, to_ll{Pre}(\at(*cl, Pre), \at(*cl, Pre))) };
 */
   do {
     if(this == element) {
-    /*@ assert \length(to_ll(*cl,*cl)) >= 2 ==> to_ll{Pre}(*cl,*cl) == ( to_ll{Pre}(*cl,element) ^ [|element|] ^ to_ll{Pre}(element->next,*cl) ); */
-    /*@ assert \length(to_ll(*cl,*cl)) == 1 ==> to_ll{Pre}(*cl,*cl) == [|element|]; */
       previous->next = this->next;
       //*cl = this->next == this ? NULL : previous;
+      //@ ghost i = 0;
       if (this->next == this) {
       	//@ assert to_ll(this,this) == [|this|];
-      	//@ assert this == *cl;
       	*cl = NULL;
       } else {
       	*cl = previous;
       }
       return;
     }
-
+	//@ assert ! in_list(element,to_ll(*cl,this) ^ [|this|]);
     previous = this;
     this = this->next;
+    //@ assert i + 1 <= \length(to_ll(*cl,*cl));
     //@ ghost i++;
   } while(this != (*cl)->next);
-  //@ assert i == \length(to_ll(\at(*cl,Pre),\at(*cl,Pre))) ==> unchanged{Pre,Here}(to_ll(*cl,*cl));
+  //@ assert ! in_list(element,to_ll(*cl,previous));
 }
 
 
@@ -351,4 +349,28 @@ circular_list_tail(const circular_list_t cl)
   for(this = *cl; this->next != *cl; this = this->next);
 
   return this;
+}
+
+/*---------------------------------------------------------------------------*/
+
+/*@ requires \valid(cl);
+	ensures *cl == NULL;
+	assigns *cl;
+*/
+void
+circular_list_init(circular_list_t cl)
+{
+  *cl = NULL;
+}
+
+/*---------------------------------------------------------------------------*/
+
+/*@ requires \valid_read(cl);
+	ensures \result == *cl;
+	assigns \nothing;
+*/
+struct cl *
+circular_list_head(const circular_list_t cl)
+{
+  return *cl;
 }
