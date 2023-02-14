@@ -4,14 +4,64 @@
 #include <string.h>
 #include <regex.h>
 
+
 #define IPV6_ADDR_LEN 16 /* définit la longueur d'une adresse IPV6*/
 #define IPV6_REGEX "([[:xdigit:]]{1,4}:){7}[[:xdigit:]]{1,4}" /*expression pour valider une adresse IPV6 */
+
+/*@ ghost char * current_str; */
+
+/*@ ghost bool current_status; */
+
+/*@
+  requires \valid(regex);
+  requires \valid(pattern+(0..strlen(pattern)));
+  requires \valid(cflags);
+  assigns \nothing;
+  behavior error:
+    assumes regcomp(regex, pattern, cflags) != 0;
+    assigns \nothing;
+    ensures \result == -1;
+  behavior success:
+    assumes regcomp(regex, pattern, cflags) == 0;
+    assigns \nothing;
+    ensures \result == 0;
+*/
+
+
+extern int regcomp(regex_t *restrict regex, const char *restrict pattern, int cflags);
+
+/*@
+  requires \valid(regex);
+  assigns \nothing;
+  behavior free:
+    assumes regfree(regex) == 0;
+    assigns \nothing;
+    ensures \result == 0;
+*/
+
+extern void regfree(regex_t *regex);
+
+/*@
+  requires \valid(addr+(0..strlen(addr)));
+  assigns \nothing;
+  behavior not_valid:
+    assumes strlen(addr) != IPV6_ADDR_LEN * 2 + 7;
+    assigns \nothing;
+    ensures \result == false;
+  behavior valid:
+    assumes strlen(addr) == IPV6_ADDR_LEN * 2 + 7;
+    assigns current_str, current_status;
+    ensures current_str == addr;
+    ensures current_status == \result;
+*/
 
 bool is_valid_ipv6_address(const char *addr) {
     int status;
     regex_t regex;
 
-    /* Vérifie que l'adresse a une longueur valide */
+/*@ assert valid_string(addr);
+  @*/
+  
     if (strlen(addr) != IPV6_ADDR_LEN * 2 + 7) {
         return false;
     }
@@ -27,6 +77,7 @@ bool is_valid_ipv6_address(const char *addr) {
     if (strstr(addr, ":::") != NULL) {
         return false;
     }
+
     if (strstr(addr, "::") != NULL && strstr(addr, "::") != addr && strstr(addr, "::") != addr + strlen(addr) - 2) {
         return false;
     }
@@ -50,7 +101,7 @@ bool is_valid_ipv6_address(const char *addr) {
     }
 
     /* Vérifie que l'adresse est conforme à la syntaxe IPv6 */
-    
+
     if (regcomp(&regex, IPV6_REGEX, REG_EXTENDED)) {
         return false;
     }
@@ -62,16 +113,41 @@ bool is_valid_ipv6_address(const char *addr) {
 
     return true;
 }
-
-
 /* Exemple d'utilisation */
 int main() {
-    unsigned char addr[IPV6_ADDR_LEN] = { 0x20, 0x01, 0x0d, 0xb8, 0x85, 0xa3, 0x08, 0x01,
-                                          0x0d, 0xb8, 0x85, 0xa3, 0x00, 0x00, 0x00, 0x01 };
-    if (is_valid_ipv6_address((const char*) addr)) {
-        printf("L'adresse IPv6 est valide.\n");
+
+    char addr2[IPV6_ADDR_LEN*2+7] = "2001:0db8:85a3:0000:0000:8a2e:0370:7334";
+    if (is_valid_ipv6_address(addr2)) {
+        printf("L'adresse IPv6 2 est valide.\n");
     } else {
-        printf("L'adresse IPv6 est invalide.\n");
+        printf("L'adresse IPv6 2 est invalide.\n");
     }
-    return 0;
+
+    char addr3[IPV6_ADDR_LEN*2+7] = "2001:db8:85a3::8a2e:0370:7334";
+    if (is_valid_ipv6_address(addr3)) {
+        printf("L'adresse IPv6 3 est valide.\n");
+    } else {
+        printf("L'adresse IPv6 3 est invalide.\n");
+    }
+
+    char addr4[IPV6_ADDR_LEN*2+7] = "2001:0db8:0000:0000:0000:ff00:0042:8329";
+    if (is_valid_ipv6_address(addr4)) {
+        printf("L'adresse IPv6 4 est valide.\n");
+    } else {
+        printf("L'adresse IPv6 4 est invalide.\n");
+    }
+
+    char addr5[IPV6_ADDR_LEN*2+7] = "2001:db8::ff00:42:8329";
+    if (is_valid_ipv6_address(addr5)) {
+        printf("L'adresse IPv6 5 est valide.\n");
+    } else {
+        printf("L'adresse IPv6 5 est invalide.\n");
+    }
+
+    char addr6[IPV6_ADDR_LEN*2+7] = "2001:db8:abcd::123";
+    if (is_valid_ipv6_address(addr6)) {
+        printf("L'adresse IPv6 6 est valide.\n");
+    } else {
+        printf("L'adresse IPv6 6 est invalide.\n");
+    }
 }
