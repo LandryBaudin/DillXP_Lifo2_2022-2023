@@ -335,9 +335,8 @@ behavior is_cl_null:
   ensures \result == NULL;
 
   behavior not_cl_null:
-    assumes *cl != NULL;
-    ensures \result != NULL;
-    ensures \nth(to_ll(*cl,*cl), \length(to_ll(*cl, *cl)) -1);
+    assumes *cl != NULL ;
+    ensures \result == \nth(to_ll(*cl,*cl), \length(to_ll(*cl, *cl)) -1);
 
   disjoint behaviors;
   complete behaviors;
@@ -384,4 +383,3 @@ circular_list_head(const circular_list_t cl)
 {
   return *cl;
 }
-

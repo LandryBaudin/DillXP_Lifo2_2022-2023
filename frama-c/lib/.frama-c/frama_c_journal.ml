@@ -1,4 +1,4 @@
-(* Frama-C journal generated at 18:03 the 20/01/2023 *)
+(* Frama-C journal generated at 00:02 the 14/02/2023 *)
 
 exception Unreachable
 exception Exception of string
@@ -6,7 +6,746 @@ exception Exception of string
 [@@@ warning "-26"]
 
 (* Run the user commands *)
-let run () = ()
+let run () =
+  Dynamic.Parameter.Bool.set "-wp" true;
+  Dynamic.Parameter.Bool.set "-rte" true;
+  Dynamic.Parameter.String.set ""
+    "/home/landry/projet_dill/lifo2/DillXP_Lifo2_2022-2023/frama-c/lib/circular-list_ll.c";
+  File.init_from_cmdline ();
+  !Db.RteGen.compute ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Dynamic.Parameter.Bool.clear "-wp" ();
+  Project.set_keep_current false;
+  Dynamic.Parameter.String.set "-wp-cache" "update";
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  Project.clear
+    ~selection:(State_selection.of_list
+                  [ State.get "Report.print_once";
+                    State.get "Report.print_csv_once";
+                    State.get "Report.classify_once";
+                    State.get "Property_status.Consolidated_status";
+                    State.get "PivotSourceState";
+                    State.get "Consolidation graph" ])
+    ();
+  ()
 
 (* Main *)
 let main () =
