@@ -63,7 +63,7 @@ inductive linked_ll{L}(struct cl *root, struct cl *bound, \list<struct cl*> l) {
 	case linked_ll_cons{L}:
 		\forall struct cl *root, *bound, \list<struct cl*> tail;
 			linked_ll_aux{L}(root->next, bound, tail) ==>
-			separated_from_list(root,tail) ==>
+			separated_from_list(root,tail) ==> 
 			linked_ll{L}(root, bound, \Cons(root, tail));
 }
 */
@@ -113,6 +113,7 @@ axiomatic to_logic_list {
 			to_ll{L}(root, bound) == \Cons(root,tail);
 
 
+
 	axiom to_ll_aux_nil{L}:
 		\forall struct cl *bound;
 			to_ll_aux(bound,bound) == \Nil;
@@ -127,7 +128,7 @@ axiomatic to_logic_list {
 */
 
 
-/* @ lemma linked_ll_unchanged {L1,L2}:
+/*@ lemma linked_ll_unchanged {L1,L2}:
 		\forall struct cl *root, *bound , \list< struct cl*> l ;
 		linked_ll{L1}(root,bound,l) ==>
 		unchanged{L1,L2}(l) ==>
@@ -147,48 +148,99 @@ axiomatic to_logic_list {
 		to_ll(root,bound) == (l1 ^ l2);
 */
 
+/*@
+	lemma to_ll_aux_nil_lemma {L}:
+		\forall struct cl *root; to_ll_aux(root,root) == \Nil;
+		
+	lemma last_element:
+		\forall struct cl *root, *bound;
+		root->next == bound ==> \nth(to_ll(bound,bound),\length(to_ll(bound,bound))) == root;
+*/
+
 
 /*---------------------------------------------------------------------------*/
 
-/*@
 
-	requires \valid(cl) && \valid(element);
+/*@ requires ValidPtr:		\valid_read(cl);
+	requires AllValid:		*cl == NULL || all_valid(*cl,*cl);
+	requires LengthMax:		\length(to_ll(*cl,*cl)) <= MAX_SIZE;
+	requires all_separated_in_list(to_ll(*cl,*cl));
+	requires Linked:		linked_ll(*cl, *cl, to_ll(*cl, *cl));
+
+
+	assigns \nothing;
+
+	ensures \result == \length(to_ll(*cl, *cl));
+
+*/
+unsigned long
+circular_list_length(const circular_list_t cl)
+{
+  unsigned long len = 1;
+  struct cl *this;
+
+  if(circular_list_is_empty(cl)) {
+//@ assert \length(to_ll(*cl,*cl)) == 0;
+    return 0;
+  }
+
+//@ assert \length(to_ll(*cl,*cl)) > 0;
+//@ assert \nth(to_ll(*cl,*cl),0) == *cl;
+
+/*@ loop invariant all_valid(this,*cl);
+	loop invariant linked_ll(*cl,*cl, to_ll(*cl,*cl));
+	loop invariant linked_ll(this,*cl, to_ll(this,*cl));
+	loop invariant len-1 == \length(to_ll(*cl,*cl)) - \length(to_ll(this,*cl));
+	loop invariant \nth(to_ll(*cl,*cl),len-1) == this;
+	loop assigns len, this;
+	loop variant \length(to_ll(this, *cl));
+*/
+  for(this = *cl; this->next != *cl; this = this->next) {
+  	len++;
+  }
+	
+//@ assert \length(to_ll(*cl,*cl)) == len;
+  return len;
+}
+
+
+/*---------------------------------------------------------------------------*/
+
+
+/*@	requires \valid(cl) && \valid(element);
 	requires *cl == NULL || all_valid(*cl,*cl);
-	requires to_ll_aux(*cl,*cl) == \Nil ==> \length(to_ll(*cl,*cl)) <= MAX_SIZE-2;
-	requires to_ll_aux(*cl,*cl) == \Nil ==> all_separated_in_list(to_ll(*cl,*cl));
-	requires to_ll_aux(*cl,*cl) == \Nil ==> linked_ll(*cl, *cl, to_ll(*cl, *cl));
-	requires to_ll_aux(*cl,*cl) == \Nil ==> (in_list(element, to_ll(*cl, *cl)) || separated_from_list(element, to_ll(*cl,*cl)));
+	requires \length(to_ll(*cl,*cl)) <= MAX_SIZE-2;
+	requires all_separated_in_list(to_ll(*cl,*cl));
+	requires linked_ll(*cl, *cl, to_ll(*cl, *cl));
+	requires in_list(element, to_ll(*cl, *cl)) || separated_from_list(element, to_ll(*cl,*cl));
 
 	assigns *cl,
 		{ l->next | struct cl *l; \at(l->next, Pre) == element &&
 			in_list(l, to_ll{Pre}(\at(*cl, Pre), *cl)) };
 
-	ensures linked_ll(\at(*cl,Post), \at(*cl,Post), to_ll(\at(*cl,Post),\at(*cl,Post)));
+	ensures linked_ll(*cl,*cl, to_ll(*cl,*cl));
+	ensures separated_from_list(element, to_ll(*cl, *cl));
 
 	behavior empty:
 		assumes *cl == NULL;
 		ensures *cl == NULL;
-		ensures separated_from_list(element, to_ll(*cl, *cl));
 
 	behavior not_in_cl:
 		assumes *cl != NULL && ! in_list(element, to_ll(*cl,*cl));
 		ensures unchanged{Pre,Post}(to_ll(*cl,*cl));
-		ensures separated_from_list(element, to_ll(*cl, *cl));
 
 	behavior in_cl_single:
 		assumes *cl != NULL && in_list(element, to_ll(*cl,*cl)) && \length(to_ll(*cl,*cl)) == 1;
 		ensures *cl == NULL;
-		ensures separated_from_list(element, to_ll(*cl, *cl));
 		
 	behavior in_cl:
 		assumes *cl != NULL && in_list(element, to_ll(*cl,*cl)) && \length(to_ll(*cl,*cl)) > 1;
 		ensures \forall integer i_element; \nth(to_ll(\old(*cl), \old(*cl)),i_element) == element ==> (
 			(*cl == element ==> to_ll(*cl,*cl) == to_ll{Pre}(\old(*cl)->next,\old(*cl)) ) &&
 			(*cl != element ==> to_ll(*cl,*cl) == ([| *cl |] ^ to_ll(element->next,*cl)) ) );
-		ensures separated_from_list(element, to_ll(*cl, *cl));
 
-complete behaviors;
-disjoint behaviors;
+	complete behaviors;
+	disjoint behaviors;
 
 */
 void
@@ -209,14 +261,23 @@ circular_list_remove(circular_list_t cl, struct cl *element)
    */
   previous = *cl;
   this = previous->next;
-  //@ ghost int i = 0;
+  //@ ghost int i = 1;
+  //@ ghost int n = circular_list_length(cl);
+  
 	//@ assert in_list(previous,to_ll(*cl,*cl)) && this == previous->next ==> in_list(this,to_ll(*cl,*cl));
 /*@
-	loop invariant 0 <= i <= \length(to_ll{Pre}(*cl,*cl));
-	loop invariant ! in_list(element,to_ll(*cl,previous));
-	loop invariant unchanged{Pre,LoopCurrent}(to_ll(*cl,previous));
-	loop invariant \length(to_ll(*cl,previous)) == i+1;
-	loop invariant this == \nth(to_ll(*cl,*cl),i+1 % \length(to_ll(*cl,*cl)));
+	loop invariant \nth(to_ll(*cl, *cl), i) == this && this != NULL;
+
+	loop invariant linked_ll(*cl,*cl,to_ll(*cl,*cl));
+	loop invariant linked_ll(this,*cl,to_ll(this,*cl));
+	loop invariant linked_ll(*cl,this,to_ll(*cl,this));
+	
+	loop invariant i>0 ==> i == \length(to_ll(*cl,this));
+	loop invariant 0 <= i <= \length(to_ll(*cl,*cl));
+	
+	loop invariant unchanged{Pre, Here}(to_ll(*cl, *cl)) ;
+	loop invariant \forall integer k ; 1 <= k < i ==> \nth(to_ll(*cl,*cl), k) != element;
+	
 	loop assigns i, this, previous, *cl,
 		{ e->next | struct cl *e; \at(e->next, Pre) == element &&
 			in_list(e, to_ll{Pre}(\at(*cl, Pre), \at(*cl, Pre))) };
@@ -240,11 +301,14 @@ circular_list_remove(circular_list_t cl, struct cl *element)
 	//@ assert ! in_list(element,to_ll(*cl,this) ^ [|this|]);
     previous = this;
     this = this->next;
-    //@ ghost i++;
+    //@ ghost i = (i+1)%n;
   } while(this != (*cl)->next);
   //@ assert unchanged{Pre,Here}(to_ll(*cl,*cl));
   //@ assert ! in_list(element,to_ll(*cl,*cl));
 }
+
+
+/*---------------------------------------------------------------------------*/
 
 
 /*@
@@ -272,28 +336,17 @@ bool circular_list_is_empty(const circular_list_t cl /*@ wp__nullable */){
 /*---------------------------------------------------------------------------*/
 
 
-/*@ requires \valid_read(cl);
-	requires *cl == NULL || all_valid(*cl,*cl);
-	requires to_ll_aux(*cl,*cl) == \Nil ==> \length(to_ll(*cl,*cl)) <= MAX_SIZE;
-	requires to_ll_aux(*cl,*cl) == \Nil ==> all_separated_in_list(to_ll(*cl,*cl));
-	requires to_ll_aux(*cl,*cl) == \Nil ==> linked_ll(*cl, *cl, to_ll(*cl, *cl));
+/*@ requires ValidPtr:		\valid_read(cl);
+	requires AllValid:		*cl == NULL || all_valid(*cl,*cl);
+	requires LengthMax:		\length(to_ll(*cl,*cl)) <= MAX_SIZE;
+	requires all_separated_in_list(to_ll(*cl,*cl));
+	requires Linked:		linked_ll(*cl, *cl, to_ll(*cl, *cl));
 
 
 	assigns \nothing;
 
-	ensures \result >= 0;
+	ensures \result == \length(to_ll(*cl, *cl));
 
-	behavior empty:
-		assumes *cl == NULL;
-		ensures \result == 0;
-
-	behavior not_empty:
-		assumes *cl != NULL;
-		ensures \result > 0;
-		ensures \result == \length(to_ll(*cl, *cl));
-
-  disjoint behaviors;
-  complete behaviors;
 */
 unsigned long
 circular_list_length(const circular_list_t cl)
@@ -310,20 +363,24 @@ circular_list_length(const circular_list_t cl)
 //@ assert \nth(to_ll(*cl,*cl),0) == *cl;
 
 /*@ loop invariant all_valid(this,*cl);
+	loop invariant linked_ll(*cl,*cl, to_ll(*cl,*cl));
+	loop invariant linked_ll(this,*cl, to_ll(this,*cl));
+	loop invariant len-1 == \length(to_ll(*cl,*cl)) - \length(to_ll(this,*cl));
 	loop invariant \nth(to_ll(*cl,*cl),len-1) == this;
-	loop invariant len == \length(to_ll(*cl,this->next));
 	loop assigns len, this;
+	loop variant \length(to_ll(this, *cl));
 */
   for(this = *cl; this->next != *cl; this = this->next) {
   	len++;
   }
-
+	
 //@ assert \length(to_ll(*cl,*cl)) == len;
-//@ assert \nth(to_ll(*cl,*cl),\length(to_ll(*cl,*cl))-1) == this;
   return len;
 }
 
+
 /*---------------------------------------------------------------------------*/
+
 
 /*@
 requires \valid(cl);
@@ -360,7 +417,9 @@ circular_list_tail(const circular_list_t cl)
   return this;
 }
 
+
 /*---------------------------------------------------------------------------*/
+
 
 /*@ requires \valid(cl);
 	ensures *cl == NULL;
@@ -372,7 +431,9 @@ circular_list_init(circular_list_t cl)
   *cl = NULL;
 }
 
+
 /*---------------------------------------------------------------------------*/
+
 
 /*@ requires \valid_read(cl);
 	ensures \result == *cl;
@@ -383,3 +444,5 @@ circular_list_head(const circular_list_t cl)
 {
   return *cl;
 }
+
+
